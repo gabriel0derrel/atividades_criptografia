@@ -28,6 +28,20 @@ class AritmeticaModular:
         return (a * b) % n
 
     @staticmethod
+    def divisao_modular(a: int, b: int, n: int) -> int:
+
+        AritmeticaModular.__validar_parametros(a, b, n)
+
+        if b == 0:
+            raise ValueError(
+                "Não é possível realizar divisão por zero."
+            )
+
+        inverso = AritmeticaModular.inverso_modular(b, n)
+
+        return (a * inverso) % n
+
+    @staticmethod
     def exponenciacao(a: int, b: int, n: int) -> int:
         AritmeticaModular.__validar_parametros(a, b, n)
 
@@ -129,4 +143,8 @@ class AritmeticaModular:
         y = coeficiente_b_anterior * sinal_b
 
         return mdc, x, y
+    @staticmethod
+    def inverso_modular(a: int, n: int) -> int:
+
+        return
 
