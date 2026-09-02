@@ -1,70 +1,71 @@
-def adicao_modular(a: int, b: int, n: int) -> int:
-    if not isinstance(a, int) or not isinstance(b, int) or not isinstance(n, int):
-        raise TypeError("Os parâmetros a, b e n devem ser inteiros.")
-    if n <= 0:
-        raise ValueError("O módulo n deve ser um inteiro positivo (n > 0).")
-    return (a + b) % n
+class AritmeticaModular:
 
-def subtracao_modular(a: int, b: int, n: int) -> int:
-    if not isinstance(a, int) or not isinstance(b, int) or not isinstance(n, int):
-        raise TypeError("Os parâmetros a, b e n devem ser inteiros.")
-    if n <= 0:
-        raise ValueError("O módulo n deve ser um inteiro positivo (n > 0).")
-    return (a - b) % n
+    @staticmethod
+    def __validar_parametros(a: int, b: int, n: int | None = None) -> None:
+        if type(a) is not int or type(b) is not int:
+            raise TypeError("a e b devem ser inteiros.")
 
-def multiplicacao_modular(a: int, b: int, n: int) -> int:
-    if not isinstance(a, int) or not isinstance(b, int) or not isinstance(n, int):
-        raise TypeError("Os parâmetros a, b e n devem ser inteiros.")
-    if n <= 0:
-        raise ValueError("O módulo n deve ser um inteiro positivo (n > 0).")
-    return (a * b) % n
+        if n is not None:
+            if type(n) is not int:
+                raise TypeError("n deve ser inteiro.")
 
-def exponenciacao_modular(a: int, b: int, n: int) -> int:
+            if n <= 0:
+                raise ValueError("O módulo n deve ser um inteiro positivo (n > 0).")
 
-    if not isinstance(a, int) or not isinstance(b, int) or not isinstance(n, int):
-        raise TypeError("Os parâmetros a, b e n devem ser inteiros.")
+    @staticmethod
+    def adicao(a: int, b: int, n: int) -> int:
+        AritmeticaModular.__validar_parametros(a, b, n)
+        return (a + b) % n
 
-    if n <= 0:
-        raise ValueError("O módulo n deve ser um inteiro positivo (n > 0).")
+    @staticmethod
+    def subtracao(a: int, b: int, n: int) -> int:
+        AritmeticaModular.__validar_parametros(a, b, n)
+        return (a - b) % n
 
-    if b < 0:
-        raise ValueError("O expoente b deve ser não negativo.")
+    @staticmethod
+    def multiplicacao(a: int, b: int, n: int) -> int:
+        AritmeticaModular.__validar_parametros(a, b, n)
+        return (a * b) % n
 
-    d = 1
+    @staticmethod
+    def exponenciacao(a: int, b: int, n: int) -> int:
+        AritmeticaModular.__validar_parametros(a, b, n)
 
-    # Representação binária do expoente
-    bits = bin(b)[2:]
+        if b < 0:
+            raise ValueError("O expoente b deve ser não negativo.")
 
-    for bit in bits:
-        d = (d * d) % n
+        resultado = 1
+        bits = bin(b)[2:]
 
-        if bit == "1":
-            d = (d * a) % n
+        for bit in bits:
+            resultado = (resultado * resultado) % n
 
-    return d
+            if bit == "1":
+                resultado = (resultado * a) % n
 
+        return resultado
 
-def mdc(a: int, b: int) -> int:
+    @staticmethod
+    def mdc(a: int, b: int) -> int:
+        AritmeticaModular.__validar_parametros(a, b)
 
-    if not isinstance(a, int) or not isinstance(b, int):
-        raise TypeError("a e b devem ser inteiros.")
+        a_abs = abs(a)
+        b_abs = abs(b)
 
-    a_abs = abs(a)
-    b_abs = abs(b)
+        if a_abs == 0 and b_abs == 0:
+            raise ValueError("MDC(0, 0) não é definido.")
 
-    if a_abs == 0 and b_abs == 0:
-        raise ValueError("MDC(0, 0) não é definido.")
+        if a_abs == 0:
+            return b_abs
 
-    if a_abs == 0:
-        return b_abs
+        if b_abs == 0:
+            return a_abs
 
-    if b_abs == 0:
-        return a_abs
+        limite = min(a_abs, b_abs)
 
-    limite = min(a_abs, b_abs)
+        for k in range(limite, 0, -1):
+            if a_abs % k == 0 and b_abs % k == 0:
+                return k
 
-    for k in range(limite, 0, -1):
-        if a_abs % k == 0 and b_abs % k == 0:
-            return k
+        return 1
 
-    return 1
