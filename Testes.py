@@ -16,9 +16,11 @@ print(f"Subtração: {a} - {b} mod {n} =",
 print(f"Multiplicação: {a} * {b} mod {n} =", 
       AritmeticaModular.multiplicacao(a, b, n))
 
+print(f"Divisão modular: {a} / {b} mod {n} =", 
+      AritmeticaModular.divisao_modular(a, b, n))
+
 print(f"Potenciação: {a}^{b} mod {n} =", 
       AritmeticaModular.exponenciacao(a, b, n))
-
 
 print("\n=== MDC POR TENTATIVA ===")
 
