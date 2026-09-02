@@ -69,6 +69,7 @@ class AritmeticaModular:
 
         return 1
 
+
     @staticmethod
     def euclides(a: int, b: int) -> int:
         AritmeticaModular.__validar_parametros(a, b)
@@ -83,4 +84,49 @@ class AritmeticaModular:
             a, b = b, a % b
         
         return a
+
+    
+    @staticmethod
+    def euclides_estendido(a: int, b: int) -> tuple[int, int, int]:
+        AritmeticaModular.__validar_parametros(a, b)
+
+        if a == 0 and b == 0:
+            raise ValueError("MDC(0, 0) não é definido.")
+
+        sinal_a = 1 if a >= 0 else -1
+        sinal_b = 1 if b >= 0 else -1
+
+        resto_anterior = abs(a)
+        resto_atual = abs(b)
+
+        coeficiente_a_anterior = 1
+        coeficiente_a_atual = 0
+
+        coeficiente_b_anterior = 0
+        coeficiente_b_atual = 1
+
+        while resto_atual != 0:
+            quociente = resto_anterior // resto_atual
+
+            resto_anterior, resto_atual = (
+                resto_atual,
+                resto_anterior - quociente * resto_atual
+            )
+
+            coeficiente_a_anterior, coeficiente_a_atual = (
+                coeficiente_a_atual,
+                coeficiente_a_anterior - quociente * coeficiente_a_atual
+            )
+
+            coeficiente_b_anterior, coeficiente_b_atual = (
+                coeficiente_b_atual,
+                coeficiente_b_anterior - quociente * coeficiente_b_atual
+            )
+
+        mdc = resto_anterior
+
+        x = coeficiente_a_anterior * sinal_a
+        y = coeficiente_b_anterior * sinal_b
+
+        return mdc, x, y
 
