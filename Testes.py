@@ -23,21 +23,21 @@ print(f"Inverso Modular: {a}^(-1) mod {n} =", AritmeticaModular.inverso_modular(
 
 print("\n=== NUMEROS PRIMOS ===")
 
-print("2 é primo: ",TeoriaDosNumeros.e_primo(2))    # True
+print("2 é primo: ",TeoriaDosNumeros.e_primo(2))    # é pra dar True
 
-print("3 é primo: ",TeoriaDosNumeros.e_primo(3))    # True
+print("3 é primo: ",TeoriaDosNumeros.e_primo(3))    # é pra dar True
 
-print("17 é primo: ",TeoriaDosNumeros.e_primo(17))   # True
+print("17 é primo: ",TeoriaDosNumeros.e_primo(17))   # é pra dar True
 
-print("25 é primo: ",TeoriaDosNumeros.e_primo(25))   # False
+print("25 é primo: ",TeoriaDosNumeros.e_primo(25))   # é pra dar False
 
-print("97 é primo: ",TeoriaDosNumeros.e_primo(97))   # True
+print("97 é primo: ",TeoriaDosNumeros.e_primo(97))   # é pra dar True
 
-print("1 é primo: ",TeoriaDosNumeros.e_primo(1))    # False
+print("1 é primo: ",TeoriaDosNumeros.e_primo(1))    # é pra dar False
 
-print("0 é primo: ",TeoriaDosNumeros.e_primo(0))    # False
+print("0 é primo: ",TeoriaDosNumeros.e_primo(0))    # é pra dar False
 
-print("-5 é primo: ",TeoriaDosNumeros.e_primo(-5))   # False
+print("-5 é primo: ",TeoriaDosNumeros.e_primo(-5))   # é pra dar False
 
 
 print("\n=== MDC POR TENTATIVA ===")
