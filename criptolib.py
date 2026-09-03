@@ -97,8 +97,24 @@ class TeoriaDosNumeros:
 
     @staticmethod
     def e_primo(numero: int) -> bool:
-        # Pendente
-        return
+        Validar.inteiros(numero)
+
+        if numero < 2:
+            return False
+
+        if numero == 2:
+            return True
+
+        if numero % 2 == 0:
+            return False
+
+        raiz_inteira = math.isqrt(numero)
+
+        for divisor in range(3, raiz_inteira + 1, 2):
+            if numero % divisor == 0:
+                return False
+
+        return True
 
     @staticmethod
     def mdc(a: int, b: int) -> int:
