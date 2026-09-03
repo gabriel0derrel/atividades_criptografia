@@ -1,36 +1,44 @@
-class AritmeticaModular:
+import math
+
+class Validar:
+    
+    @staticmethod
+    def inteiros(*valores: int) -> None:
+        for valor in valores:
+            if type(valor) is not int: 
+                raise TypeError("Todos os operandos devem ser inteiros.")
 
     @staticmethod
-    def __validar_parametros(a: int, b: int, n: int | None = None) -> None:
-        if type(a) is not int or type(b) is not int:
-            raise TypeError("a e b devem ser inteiros.")
-
-        if n is not None:
-            if type(n) is not int:
-                raise TypeError("n deve ser inteiro.")
-
+    def modulo(*modulos: int) -> None:
+        Validar.inteiros(*modulos)
+        for n in modulos:
             if n <= 0:
                 raise ValueError("O módulo n deve ser um inteiro positivo (n > 0).")
 
+class AritmeticaModular:
+
     @staticmethod
     def adicao(a: int, b: int, n: int) -> int:
-        AritmeticaModular.__validar_parametros(a, b, n)
+        Validar.inteiros(a, b)
+        Validar.modulo(n)
         return (a + b) % n
 
     @staticmethod
     def subtracao(a: int, b: int, n: int) -> int:
-        AritmeticaModular.__validar_parametros(a, b, n)
+        Validar.inteiros(a, b)
+        Validar.modulo(n)
         return (a - b) % n
 
     @staticmethod
     def multiplicacao(a: int, b: int, n: int) -> int:
-        AritmeticaModular.__validar_parametros(a, b, n)
+        Validar.inteiros(a, b)
+        Validar.modulo(n)
         return (a * b) % n
 
     @staticmethod
     def divisao_modular(a: int, b: int, n: int) -> int:
-
-        AritmeticaModular.__validar_parametros(a, b, n)
+        Validar.inteiros(a, b)
+        Validar.modulo(n)
 
         if b == 0:
             raise ValueError(
@@ -43,7 +51,8 @@ class AritmeticaModular:
 
     @staticmethod
     def exponenciacao(a: int, b: int, n: int) -> int:
-        AritmeticaModular.__validar_parametros(a, b, n)
+        Validar.inteiros(a, b)
+        Validar.modulo(n)
 
         if b < 0:
             raise ValueError("O expoente b deve ser não negativo.")
@@ -60,8 +69,40 @@ class AritmeticaModular:
         return resultado
 
     @staticmethod
+    def inverso_modular(a: int, n: int) -> int:
+        Validar.inteiros(a)
+        Validar.modulo(n)
+        mdc, x, _ = TeoriaDosNumeros.euclides_estendido(a, n)
+        
+        if mdc != 1:
+            raise ValueError(f"O inverso modular de {a} mod {n} não existe pois MDC({a}, {n}) = {mdc} != 1.")
+            
+        return x % n
+
+    @staticmethod
+    def chines_resto(residuos: list[int], modulos: list[int]) -> int:
+        Validar.inteiros(*residuos)
+        Validar.modulo(*modulos)
+
+        m = math.prod(modulos)
+        m_i = [m // modulo for modulo in modulos]
+        m_i_inv = [AritmeticaModular.inverso_modular(m_i_aux, modulo) for m_i_aux, modulo in zip(m_i, modulos)]
+
+        resposta = sum(residuo*m_i_aux*m_i_inv_aux for residuo, m_i_aux, m_i_inv_aux in zip(residuos, m_i, m_i_inv))
+        resposta %= m
+        return resposta
+
+
+class TeoriaDosNumeros:
+
+    @staticmethod
+    def e_primo(numero: int) -> bool:
+        # Pendente
+        return
+
+    @staticmethod
     def mdc(a: int, b: int) -> int:
-        AritmeticaModular.__validar_parametros(a, b)
+        Validar.inteiros(a, b)
 
         a = abs(a)
         b = abs(b)
@@ -86,7 +127,7 @@ class AritmeticaModular:
 
     @staticmethod
     def euclides(a: int, b: int) -> int:
-        AritmeticaModular.__validar_parametros(a, b)
+        Validar.inteiros(a, b)
 
         a = abs(a)
         b = abs(b)
@@ -102,7 +143,7 @@ class AritmeticaModular:
     
     @staticmethod
     def euclides_estendido(a: int, b: int) -> tuple[int, int, int]:
-        AritmeticaModular.__validar_parametros(a, b)
+        Validar.inteiros(a, b)
 
         if a == 0 and b == 0:
             raise ValueError("MDC(0, 0) não é definido.")
@@ -143,8 +184,19 @@ class AritmeticaModular:
         y = coeficiente_b_anterior * sinal_b
 
         return mdc, x, y
+
     @staticmethod
-    def inverso_modular(a: int, n: int) -> int:
+    def phi_de_euler(n: int) -> int:
+        Validar.modulo(n)
 
-        return
+        resultado = n
+        for i in range(2, math.isqrt(n) + 1):
+            if n % i == 0:
+                while n % i == 0:
+                    n //= i
+                resultado -= resultado // i
 
+        if n > 1:
+            resultado -= resultado // n
+
+        return resultado
