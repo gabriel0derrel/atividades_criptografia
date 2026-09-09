@@ -58,12 +58,13 @@ class AritmeticaModular:
             raise ValueError("O expoente b deve ser não negativo.")
 
         resultado = 1
-        bits = bin(b)[2:]
 
-        for bit in bits:
+        for i in range(b.bit_length() - 1, -1, -1):
+            bit = (b >> i) & 1
+
             resultado = (resultado * resultado) % n
 
-            if bit == "1":
+            if bit == 1:
                 resultado = (resultado * a) % n
 
         return resultado
