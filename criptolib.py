@@ -15,6 +15,16 @@ class Validar:
             if n <= 0:
                 raise ValueError("O módulo n deve ser um inteiro positivo (n > 0).")
 
+    @staticmethod
+    def coprimos_2_a_2(modulos: list[int]) -> None:
+        for i in range(len(modulos)):
+            for j in range(i + 1, len(modulos)):
+                if TeoriaDosNumeros.mdc(modulos[i], modulos[j]) != 1:
+                    raise ValueError(
+                        f"Os módulos devem ser primos entre si 2 a 2. "
+                        f"MDC({modulos[i]}, {modulos[j]}) != 1."
+                    )
+
 class AritmeticaModular:
 
     @staticmethod
@@ -84,6 +94,7 @@ class AritmeticaModular:
     def chines_resto(residuos: list[int], modulos: list[int]) -> int:
         Validar.inteiros(*residuos)
         Validar.modulo(*modulos)
+        Validar.coprimos_2_a_2(modulos)
 
         m = math.prod(modulos)
         m_i = [m // modulo for modulo in modulos]
