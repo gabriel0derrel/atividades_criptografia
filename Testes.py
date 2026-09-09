@@ -62,11 +62,10 @@ def menu_principal():
         print("=== MENU PRINCIPAL: CRIPTOLIB ===")
         print("1. Aritmética Modular (Sub-menu)")
         print("2. Verificar Número Primo")
-        print("3. MDC por Tentativa")
-        print("4. Algoritmo de Euclides")
-        print("5. Euclides Estendido")
-        print("6. Função Phi de Euler")
-        print("7. Teorema Chinês do Resto")
+        print("3. MDC")
+        print("4. Euclides Estendido")
+        print("5. Função Phi de Euler")
+        print("6. Teorema Chinês do Resto")
         print("0. Sair")
         print("="*30)
         
@@ -87,28 +86,26 @@ def menu_principal():
             except Exception as erro:
                 print(f"\n[ERRO NA OPERAÇÃO] {erro}")
                 
-        elif opcao in ['3', '4', '5']:
+        elif opcao in ['3', '4']:
             a = obter_inteiro("Digite o valor de a: ")
             b = obter_inteiro("Digite o valor de b: ")
             try:
                 if opcao == '3':
                     print(f"\nMDC({a}, {b}): {TeoriaDosNumeros.mdc(a, b)}")
                 elif opcao == '4':
-                    print(f"\nEuclides({a}, {b}): {TeoriaDosNumeros.euclides(a, b)}")
-                elif opcao == '5':
                     mdc, x, y = TeoriaDosNumeros.euclides_estendido(a, b)
                     print(f"\nResultado -> MDC: {mdc} | x: {x} | y: {y}")
             except Exception as erro:
                 print(f"\n[ERRO NA OPERAÇÃO] {erro}")
                 
-        elif opcao == '6':
+        elif opcao == '5':
             n = obter_inteiro("Digite o valor de n para calcular ϕ(n): ")
             try:
                 print(f"\nϕ({n}) = {TeoriaDosNumeros.phi_de_euler(n)}")
             except Exception as erro:
                 print(f"\n[ERRO NA OPERAÇÃO] {erro}")
                 
-        elif opcao == '7':
+        elif opcao == '6':
             try:
                 qtd = obter_inteiro("Quantas congruências tem o sistema? ")
                 if qtd <= 0:

@@ -127,31 +127,6 @@ class TeoriaDosNumeros:
         if a == 0 and b == 0:
             raise ValueError("MDC(0, 0) não é definido.")
 
-        if a == 0:
-            return b
-
-        if b == 0:
-            return a
-
-        limite = min(a, b)
-
-        for k in range(limite, 0, -1):
-            if a % k == 0 and b % k == 0:
-                return k
-
-        return 1
-
-
-    @staticmethod
-    def euclides(a: int, b: int) -> int:
-        Validar.inteiros(a, b)
-
-        a = abs(a)
-        b = abs(b)
-
-        if a == 0 and b == 0:
-            raise ValueError("MDC(0, 0) não é definido.")
-
         while b != 0:
             a, b = b, a % b
         
