@@ -25,6 +25,20 @@ class Validar:
                         f"MDC({modulos[i]}, {modulos[j]}) != 1."
                     )
 
+    @staticmethod
+    def matriz_quadrada(matriz: list[list[int]]) -> None:
+        if not isinstance(matriz, list) or not matriz:
+            raise TypeError("A matriz deve ser uma lista não vazia.")
+
+        if any(not isinstance(linha, list) for linha in matriz):
+            raise TypeError("A matriz deve ser uma lista de listas.")
+
+        if any(len(linha) != len(matriz[0]) for linha in matriz):
+            raise ValueError("Todas as linhas da matriz devem possuir o mesmo tamanho.")
+
+        if len(matriz) != len(matriz[0]):
+            raise ValueError("A matriz deve ser quadrada.")
+
 class AritmeticaModular:
 
     @staticmethod
@@ -203,3 +217,82 @@ class TeoriaDosNumeros:
             resultado -= resultado // n
 
         return resultado
+
+class AlgebraLinear:
+
+    @staticmethod
+    def determinante(matriz: list[list[int]]) -> int:
+        Validar.matriz_quadrada(matriz)
+
+        matriz = [linha[:] for linha in matriz]
+        trocas = 0
+        pivot_anterior = 1
+
+        for i in range(len(matriz) - 1):
+            pivot = matriz[i][i]
+
+            if pivot == 0:
+                for j in range(i + 1, len(matriz)):
+                    if matriz[j][i] != 0:
+                        matriz[i], matriz[j] = matriz[j], matriz[i]
+                        trocas += 1
+                        pivot = matriz[i][i]
+                        break
+                else:
+                    return 0
+
+            for j in range(i + 1, len(matriz)):
+                for k in range(i + 1, len(matriz)):
+                    matriz[j][k] = (
+                        matriz[j][k] * pivot
+                        - matriz[j][i] * matriz[i][k]
+                    ) // pivot_anterior
+
+            pivot_anterior = pivot
+
+            for j in range(i + 1, len(matriz)):
+                matriz[j][i] = 0
+
+        determinante = matriz[-1][-1]
+
+        if trocas % 2 != 0:
+            determinante *= -1
+
+        return determinante
+
+    @staticmethod
+    def inversa(matriz: list[list[int]]) -> list[list[float]]:
+        Validar.matriz_quadrada(matriz)
+
+        matriz = [linha[:] for linha in matriz]
+        tamanho = len(matriz)
+
+        identidade = [ [1 if i == j else 0 for j in range(tamanho)] for i in range(tamanho) ]
+
+        matriz_aumentada = [ matriz[i] + identidade[i] for i in range(tamanho) ]
+
+        for i in range(tamanho):
+            pivot = matriz_aumentada[i][i]
+
+            if pivot == 0:
+                for j in range(i + 1, tamanho):
+                    if matriz_aumentada[j][i] != 0:
+                        matriz_aumentada[i], matriz_aumentada[j] = matriz_aumentada[j], matriz_aumentada[i]
+                        pivot = matriz_aumentada[i][i]
+                        break
+                else:
+                    raise ValueError("A matriz não possui inversa.")
+
+            for j in range(tamanho * 2):
+                matriz_aumentada[i][j] = matriz_aumentada[i][j] / pivot
+
+            for j in range(tamanho):
+                if j == i:
+                    continue
+
+                fator = matriz_aumentada[j][i]
+
+                for k in range(tamanho * 2):
+                    matriz_aumentada[j][k] = matriz_aumentada[j][k] - fator * matriz_aumentada[i][k]
+
+        return [ linha[tamanho:] for linha in matriz_aumentada ]
