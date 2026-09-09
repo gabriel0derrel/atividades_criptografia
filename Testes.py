@@ -86,6 +86,7 @@ def menu_principal():
         print("6. Teorema Chinês do Resto")
         print("7. Determinante de Matriz")
         print("8. Inversa de Matriz")
+        print("9. Inversa Modular da Matriz")
         print("0. Sair")
         print("="*30)
         
@@ -147,7 +148,7 @@ def menu_principal():
             except Exception as erro:
                 print(f"\n[ERRO NA OPERAÇÃO] {erro}")
 
-        elif opcao in ['7', '8']:
+        elif opcao in ['7', '8', '9']:
             ordem = obter_inteiro("Digite a ordem da matriz quadrada (ex: 3 para 3x3): ")
             if ordem <= 0:
                 print("\n[ERRO] A ordem da matriz deve ser um número positivo.")
@@ -162,6 +163,10 @@ def menu_principal():
                 elif opcao == '8':
                     resultado = AlgebraLinear.inversa(matriz)
                     print(f"\nA matriz inversa é:\n{resultado}")
+                elif opcao == '9':
+                    n = obter_inteiro("Digite o valor do módulo n: ")
+                    resultado = AlgebraLinear.inversa_modular(matriz, n)
+                    print(f"\nA matriz inversa no módulo {n} é:\n{resultado}")
             except Exception as erro:
                 print(f"\n[ERRO NA OPERAÇÃO] {erro}")
 
