@@ -1,4 +1,4 @@
-from criptolib import AritmeticaModular, TeoriaDosNumeros
+from criptolib import AritmeticaModular, TeoriaDosNumeros, AlgebraLinear
 
 def obter_inteiro(mensagem: str) -> int:
     """Função auxiliar para garantir que o usuário digite um número inteiro."""
@@ -7,6 +7,24 @@ def obter_inteiro(mensagem: str) -> int:
             return int(input(mensagem))
         except ValueError:
             print("[ERRO DE DIGITAÇÃO] Por favor, digite um número inteiro válido.")
+
+def obter_matriz(ordem: int) -> list[list[int]]:
+    """Função auxiliar para ler uma matriz quadrada do usuário."""
+    matriz = []
+    print(f"\nDigite os elementos da matriz {ordem}x{ordem} (linha por linha, separados por espaço):")
+    for i in range(ordem):
+        while True:
+            try:
+                linha = input(f"Linha {i+1}: ").strip().split()
+                linha_ints = [int(x) for x in linha]
+                if len(linha_ints) != ordem:
+                    print(f"[ERRO DE DIGITAÇÃO] Você deve digitar exatamente {ordem} números separados por espaço.")
+                    continue
+                matriz.append(linha_ints)
+                break
+            except ValueError:
+                print("[ERRO DE DIGITAÇÃO] Por favor, digite apenas números inteiros.")
+    return matriz
 
 def menu_aritmetica_modular():
     while True:
@@ -66,6 +84,9 @@ def menu_principal():
         print("4. Euclides Estendido")
         print("5. Função Phi de Euler")
         print("6. Teorema Chinês do Resto")
+        print("7. Determinante de Matriz")
+        print("8. Inversa de Matriz")
+        print("9. Inversa Modular da Matriz")
         print("0. Sair")
         print("="*30)
         
@@ -126,6 +147,29 @@ def menu_principal():
                 print(f"\nResultado: x = {resultado}")
             except Exception as erro:
                 print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        elif opcao in ['7', '8', '9']:
+            ordem = obter_inteiro("Digite a ordem da matriz quadrada (ex: 3 para 3x3): ")
+            if ordem <= 0:
+                print("\n[ERRO] A ordem da matriz deve ser um número positivo.")
+                continue
+                
+            matriz = obter_matriz(ordem)
+            
+            try:
+                if opcao == '7':
+                    resultado = AlgebraLinear.determinante(matriz)
+                    print(f"\nO determinante da matriz é: {resultado}")
+                elif opcao == '8':
+                    resultado = AlgebraLinear.inversa(matriz)
+                    print(f"\nA matriz inversa é:\n{resultado}")
+                elif opcao == '9':
+                    n = obter_inteiro("Digite o valor do módulo n: ")
+                    resultado = AlgebraLinear.inversa_modular(matriz, n)
+                    print(f"\nA matriz inversa no módulo {n} é:\n{resultado}")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
         else:
             print("\nOpção inválida. Tente novamente.")
 
