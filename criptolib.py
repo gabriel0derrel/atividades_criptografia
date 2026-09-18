@@ -1,16 +1,17 @@
 import math
+from typing import Union, List, Tuple
 
-class Validar:
-    
+
+class _Validar:
     @staticmethod
     def inteiros(*valores: int) -> None:
         for valor in valores:
-            if type(valor) is not int: 
+            if type(valor) is not int:
                 raise TypeError("Todos os operandos devem ser inteiros.")
 
     @staticmethod
     def modulo(*modulos: int) -> None:
-        Validar.inteiros(*modulos)
+        _Validar.inteiros(*modulos)
         for n in modulos:
             if n <= 0:
                 raise ValueError("O módulo n deve ser um inteiro positivo (n > 0).")
@@ -19,7 +20,7 @@ class Validar:
     def coprimos_2_a_2(modulos: list[int]) -> None:
         for i in range(len(modulos)):
             for j in range(i + 1, len(modulos)):
-                if TeoriaDosNumeros.mdc(modulos[i], modulos[j]) != 1:
+                if InteiroModular.mdc(modulos[i], modulos[j]) != 1:
                     raise ValueError(
                         f"Os módulos devem ser primos entre si 2 a 2. "
                         f"MDC({modulos[i]}, {modulos[j]}) != 1."
@@ -41,49 +42,93 @@ class Validar:
 
     @staticmethod
     def inversivel_por_modulo(matriz: list[list[int]], n: int) -> None:
-        determinante = AlgebraLinear.determinante(matriz)
+        m_obj = Matriz(matriz) if isinstance(matriz, list) else matriz
+        determinante = m_obj.determinante()
 
-        if TeoriaDosNumeros.mdc(determinante, n) != 1:
+        if InteiroModular.mdc(determinante, n) != 1:
             raise ValueError(f"A matriz não possui inversa modular em módulo {n}.")
 
-class AritmeticaModular:
 
-    @staticmethod
-    def adicao(a: int, b: int, n: int) -> int:
-        Validar.inteiros(a, b)
-        Validar.modulo(n)
-        return (a + b) % n
+class InteiroModular:
 
-    @staticmethod
-    def subtracao(a: int, b: int, n: int) -> int:
-        Validar.inteiros(a, b)
-        Validar.modulo(n)
-        return (a - b) % n
+    def __init__(self, valor: int, modulo: int):
+        _Validar.inteiros(valor)
+        _Validar.modulo(modulo)
+        self.modulo = modulo
+        self.valor = valor % modulo
 
-    @staticmethod
-    def multiplicacao(a: int, b: int, n: int) -> int:
-        Validar.inteiros(a, b)
-        Validar.modulo(n)
-        return (a * b) % n
+    def adicao(self, outro: Union["InteiroModular", int]) -> "InteiroModular":
+        if isinstance(outro, InteiroModular):
+            if self.modulo != outro.modulo:
+                raise ValueError("Operações requerem elementos com o mesmo módulo.")
+            b = outro.valor
+        else:
+            b = outro
 
-    @staticmethod
-    def divisao_modular(a: int, b: int, n: int) -> int:
-        Validar.inteiros(a, b)
-        Validar.modulo(n)
+        a = self.valor
+        n = self.modulo
+
+        _Validar.inteiros(a, b)
+        _Validar.modulo(n)
+        return InteiroModular((a + b) % n, n)
+
+    def subtracao(self, outro: Union["InteiroModular", int]) -> "InteiroModular":
+        if isinstance(outro, InteiroModular):
+            if self.modulo != outro.modulo:
+                raise ValueError("Operações requerem elementos com o mesmo módulo.")
+            b = outro.valor
+        else:
+            b = outro
+        
+        a = self.valor
+        n = self.modulo
+
+        _Validar.inteiros(a, b)
+        _Validar.modulo(n)
+        return InteiroModular((a - b) % n, n)
+
+    def multiplicacao(self, outro: Union["InteiroModular", int]) -> "InteiroModular":
+        if isinstance(outro, InteiroModular):
+            if self.modulo != outro.modulo:
+                raise ValueError("Operações requerem elementos com o mesmo módulo.")
+            b = outro.valor
+        else:
+            b = outro
+        
+        a = self.valor
+        n = self.modulo
+
+        _Validar.inteiros(a, b)
+        _Validar.modulo(n)
+        return InteiroModular((a * b) % n, n)
+
+    def divisao_modular(self, outro: Union["InteiroModular", int]) -> "InteiroModular":
+        if isinstance(outro, InteiroModular):
+            if self.modulo != outro.modulo:
+                raise ValueError("Operações requerem elementos com o mesmo módulo.")
+            b = outro.valor
+        else:
+            b = outro
 
         if b == 0:
-            raise ValueError(
-                "Não é possível realizar divisão por zero."
-            )
+            raise ValueError("Não é possível realizar divisão por zero.")
+        
+        a = self.valor
+        n = self.modulo
 
-        inverso = AritmeticaModular.inverso_modular(b, n)
+        _Validar.inteiros(a, b)
+        _Validar.modulo(n)
 
-        return (a * inverso) % n
+        inverso = InteiroModular(b, n).inverso_modular().valor
 
-    @staticmethod
-    def exponenciacao(a: int, b: int, n: int) -> int:
-        Validar.inteiros(a, b)
-        Validar.modulo(n)
+        return InteiroModular((a * inverso) % n, n)
+
+    def exponenciacao(self, b: int) -> "InteiroModular":
+        a = self.valor
+        n = self.modulo
+
+        _Validar.inteiros(a, b)
+        _Validar.modulo(n)
 
         if b < 0:
             raise ValueError("O expoente b deve ser não negativo.")
@@ -98,42 +143,26 @@ class AritmeticaModular:
             if bit == 1:
                 resultado = (resultado * a) % n
 
-        return resultado
+        return InteiroModular(resultado, n)
 
-    @staticmethod
-    def inverso_modular(a: int, n: int) -> int:
-        Validar.inteiros(a)
-        Validar.modulo(n)
-        mdc, x, _ = TeoriaDosNumeros.euclides_estendido(a, n)
-        
+    def inverso_modular(self) -> "InteiroModular":
+        a = self.valor
+        n = self.modulo
+
+        _Validar.inteiros(a)
+        _Validar.modulo(n)
+        mdc, x, _ = InteiroModular.euclides_estendido(a, n)
+
         if mdc != 1:
-            raise ValueError(f"O inverso modular de {a} mod {n} não existe pois MDC({a}, {n}) = {mdc} != 1.")
-            
-        return x % n
+            raise ValueError(
+                f"O inverso modular de {a} mod {n} não existe pois MDC({a}, {n}) = {mdc} != 1."
+            )
 
-    @staticmethod
-    def chines_resto(residuos: list[int], modulos: list[int]) -> int:
-        if len(residuos) != len(modulos):
-            raise ValueError(f"O tamanho do vetro de resíduos deve ser igual ao tamanho do vetor de módulos.")
-        
-        Validar.inteiros(*residuos)
-        Validar.modulo(*modulos)
-        Validar.coprimos_2_a_2(modulos)
-
-        m = math.prod(modulos)
-        m_i = [m // modulo for modulo in modulos]
-        m_i_inv = [AritmeticaModular.inverso_modular(m_i_aux, modulo) for m_i_aux, modulo in zip(m_i, modulos)]
-
-        resposta = sum(residuo*m_i_aux*m_i_inv_aux for residuo, m_i_aux, m_i_inv_aux in zip(residuos, m_i, m_i_inv))
-        resposta %= m
-        return resposta
-
-
-class TeoriaDosNumeros:
+        return InteiroModular(x % n, n)
 
     @staticmethod
     def e_primo(numero: int) -> bool:
-        Validar.inteiros(numero)
+        _Validar.inteiros(numero)
 
         if numero < 2:
             return False
@@ -154,7 +183,7 @@ class TeoriaDosNumeros:
 
     @staticmethod
     def mdc(a: int, b: int) -> int:
-        Validar.inteiros(a, b)
+        _Validar.inteiros(a, b)
 
         a = abs(a)
         b = abs(b)
@@ -164,13 +193,12 @@ class TeoriaDosNumeros:
 
         while b != 0:
             a, b = b, a % b
-        
+
         return a
 
-    
     @staticmethod
-    def euclides_estendido(a: int, b: int) -> tuple[int, int, int]:
-        Validar.inteiros(a, b)
+    def euclides_estendido(a: int, b: int) -> Tuple[int, int, int]:
+        _Validar.inteiros(a, b)
 
         if a == 0 and b == 0:
             raise ValueError("MDC(0, 0) não é definido.")
@@ -190,20 +218,11 @@ class TeoriaDosNumeros:
         while resto_atual != 0:
             quociente = resto_anterior // resto_atual
 
-            resto_anterior, resto_atual = (
-                resto_atual,
-                resto_anterior - quociente * resto_atual
-            )
+            resto_anterior, resto_atual = resto_atual, (resto_anterior - quociente * resto_atual)
 
-            coeficiente_a_anterior, coeficiente_a_atual = (
-                coeficiente_a_atual,
-                coeficiente_a_anterior - quociente * coeficiente_a_atual
-            )
+            coeficiente_a_anterior, coeficiente_a_atual = coeficiente_a_atual, (coeficiente_a_anterior - quociente * coeficiente_a_atual)
 
-            coeficiente_b_anterior, coeficiente_b_atual = (
-                coeficiente_b_atual,
-                coeficiente_b_anterior - quociente * coeficiente_b_atual
-            )
+            coeficiente_b_anterior, coeficiente_b_atual = coeficiente_b_atual, (coeficiente_b_anterior - quociente * coeficiente_b_atual)
 
         mdc = resto_anterior
 
@@ -214,7 +233,7 @@ class TeoriaDosNumeros:
 
     @staticmethod
     def phi_de_euler(n: int) -> int:
-        Validar.modulo(n)
+        _Validar.modulo(n)
 
         resultado = n
         for i in range(2, math.isqrt(n) + 1):
@@ -228,13 +247,15 @@ class TeoriaDosNumeros:
 
         return resultado
 
-class AlgebraLinear:
 
-    @staticmethod
-    def determinante(matriz: list[list[int]]) -> int:
-        Validar.matriz_quadrada(matriz)
+class Matriz:
 
-        matriz = [linha[:] for linha in matriz]
+    def __init__(self, matriz: list[list[Union[int, float]]]):
+        _Validar.matriz_quadrada(matriz)
+        self.dados = [linha[:] for linha in matriz]
+
+    def determinante(self) -> int:
+        matriz = [linha[:] for linha in self.dados]
         trocas = 0
         pivot_anterior = 1
 
@@ -253,10 +274,7 @@ class AlgebraLinear:
 
             for j in range(i + 1, len(matriz)):
                 for k in range(i + 1, len(matriz)):
-                    matriz[j][k] = (
-                        matriz[j][k] * pivot
-                        - matriz[j][i] * matriz[i][k]
-                    ) // pivot_anterior
+                    matriz[j][k] = (matriz[j][k] * pivot - matriz[j][i] * matriz[i][k]) // pivot_anterior
 
             pivot_anterior = pivot
 
@@ -270,16 +288,26 @@ class AlgebraLinear:
 
         return determinante
 
-    @staticmethod
-    def inversa(matriz: list[list[int]]) -> list[list[float]]:
-        Validar.matriz_quadrada(matriz)
+    def modulo(self, n: int) -> "Matriz":
+        _Validar.modulo(n)
+        _Validar.inteiros(*(elemento for linha in self.dados for elemento in linha))
 
-        matriz = [linha[:] for linha in matriz]
+        matriz_mod = []
+        for linha in self.dados:
+            nova_linha = []
+            for elemento in linha:
+                nova_linha.append(elemento % n)
+            matriz_mod.append(nova_linha)
+
+        return Matriz(matriz_mod)
+
+    def inversa(self) -> "Matriz":
+        matriz = [linha[:] for linha in self.dados]
         tamanho = len(matriz)
 
-        identidade = [ [1 if i == j else 0 for j in range(tamanho)] for i in range(tamanho) ]
+        identidade = [[1 if i == j else 0 for j in range(tamanho)] for i in range(tamanho)]
 
-        matriz_aumentada = [ matriz[i] + identidade[i] for i in range(tamanho) ]
+        matriz_aumentada = [matriz[i] + identidade[i] for i in range(tamanho)]
 
         for i in range(tamanho):
             pivot = matriz_aumentada[i][i]
@@ -287,7 +315,7 @@ class AlgebraLinear:
             if pivot == 0:
                 for j in range(i + 1, tamanho):
                     if matriz_aumentada[j][i] != 0:
-                        matriz_aumentada[i], matriz_aumentada[j] = matriz_aumentada[j], matriz_aumentada[i]
+                        matriz_aumentada[i], matriz_aumentada[j] = matriz_aumentada[j],matriz_aumentada[i]
                         pivot = matriz_aumentada[i][i]
                         break
                 else:
@@ -305,32 +333,32 @@ class AlgebraLinear:
                 for k in range(tamanho * 2):
                     matriz_aumentada[j][k] = matriz_aumentada[j][k] - fator * matriz_aumentada[i][k]
 
-        return [ linha[tamanho:] for linha in matriz_aumentada ]
+        return Matriz([linha[tamanho:] for linha in matriz_aumentada])
 
-    @staticmethod
-    def inversa_modular(matriz: list[list[int]], n: int) -> list[list[int]]:
-        Validar.matriz_quadrada(matriz)
-        Validar.modulo(n)
-        Validar.inteiros(*(elemento for linha in matriz for elemento in linha))
-        Validar.inversivel_por_modulo(matriz, n)
+    def inversa_modular(self, n: int) -> "Matriz":
+        matriz = self.dados
+        _Validar.matriz_quadrada(matriz)
+        _Validar.modulo(n)
+        _Validar.inteiros(*(elemento for linha in matriz for elemento in linha))
+        _Validar.inversivel_por_modulo(matriz, n)
 
-        matriz_mod = [ [elemento % n for elemento in linha] for linha in matriz ]
+        matriz_mod = [[elemento % n for elemento in linha] for linha in matriz]
         tamanho = len(matriz_mod)
 
-        identidade = [ [ 1 if i == j else 0 for j in range(tamanho) ] for i in range(tamanho) ]
-        matriz_aumentada = [ matriz_mod[i] + identidade[i] for i in range(tamanho) ]
+        identidade = [[1 if i == j else 0 for j in range(tamanho)] for i in range(tamanho)]
+        matriz_aumentada = [matriz_mod[i] + identidade[i] for i in range(tamanho)]
 
         for i in range(tamanho):
             pivot = matriz_aumentada[i][i]
 
-            if TeoriaDosNumeros.mdc(pivot, n) != 1:
+            if InteiroModular.mdc(pivot, n) != 1:
                 for j in range(i + 1, tamanho):
-                    if TeoriaDosNumeros.mdc(matriz_aumentada[j][i], n) == 1:
-                        matriz_aumentada[i], matriz_aumentada[j] = matriz_aumentada[j], matriz_aumentada[i]
+                    if InteiroModular.mdc(matriz_aumentada[j][i], n) == 1:
+                        matriz_aumentada[i], matriz_aumentada[j] = matriz_aumentada[j],matriz_aumentada[i]
                         pivot = matriz_aumentada[i][i]
                         break
 
-            inv_pivot = AritmeticaModular.inverso_modular(pivot, n)
+            inv_pivot = InteiroModular(pivot, n).inverso_modular().valor
 
             for j in range(tamanho * 2):
                 matriz_aumentada[i][j] = (matriz_aumentada[i][j] * inv_pivot) % n
@@ -342,6 +370,28 @@ class AlgebraLinear:
                 fator = matriz_aumentada[j][i]
 
                 for k in range(tamanho * 2):
-                    matriz_aumentada[j][k] = (matriz_aumentada[j][k] - fator * matriz_aumentada[i][k]) % n
+                    matriz_aumentada[j][k] = ( matriz_aumentada[j][k] - fator * matriz_aumentada[i][k] ) % n
 
-        return [linha[tamanho:] for linha in matriz_aumentada]
+        return Matriz([linha[tamanho:] for linha in matriz_aumentada])
+
+class Congruencias:
+
+    def __init__(self, residuos: list[int], modulos: list[int]):
+        _Validar.inteiros(*residuos)
+        _Validar.modulo(*modulos)
+        _Validar.coprimos_2_a_2(modulos)
+        if not residuos or not modulos:
+            raise ValueError("As listas de resíduos e módulos não podem ser vazias.")
+        if len(residuos) != len(modulos):
+            raise ValueError("O tamanho do vetor de resíduos deve ser igual ao do vetor de módulos.")
+
+        self.residuos = residuos
+        self.modulos = modulos
+
+    def resolver(self) -> int:
+        m = math.prod(self.modulos)
+        m_i = [m // modulo for modulo in self.modulos]
+        m_i_inv = [ InteiroModular(m_i_aux, modulo).inverso_modular().valor for m_i_aux, modulo in zip(m_i, self.modulos) ]
+
+        resposta = sum(residuo * m_i_aux * m_i_inv_aux for residuo, m_i_aux, m_i_inv_aux in zip(self.residuos, m_i, m_i_inv))
+        return resposta % m
