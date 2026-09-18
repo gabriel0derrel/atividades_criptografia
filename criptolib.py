@@ -374,6 +374,36 @@ class Matriz:
 
         return Matriz([linha[tamanho:] for linha in matriz_aumentada])
 
+
+    def multiplicacao(self, outra: Union["Matriz", list[list[Union[int, float]]]]) -> "Matriz": # Outra * Self
+        matriz_b = outra.dados if isinstance(outra, Matriz) else outra
+        matriz_a = self.dados
+
+        _Validar.matriz_quadrada(matriz_b)
+
+        if len(matriz_b) != len(matriz_a):
+            raise ValueError("As matrizes devem ter dimensões compatíveis para a multiplicação.")
+
+        n = len(matriz_a)
+
+        resultado = []
+        for i in range(n):
+            linha = []
+            for j in range(n):
+                soma = 0
+                for k in range(n):
+                    soma += matriz_b[i][k] * matriz_a[k][j]
+                linha.append(soma)
+            resultado.append(linha)
+
+        return Matriz(resultado)
+
+    def multiplicacao_modular(self, outra: Union["Matriz", list[list[Union[int, float]]]], n: int) -> "Matriz": # (Outra * Self) mod n
+        return self.multiplicacao(outra).modulo(n)
+
+    
+
+
 class Congruencias:
 
     def __init__(self, residuos: list[int], modulos: list[int]):
