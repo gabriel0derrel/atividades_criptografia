@@ -402,8 +402,6 @@ class Matriz:
         return self.multiplicacao(outra).modulo(n)
 
     
-
-
 class Congruencias:
 
     def __init__(self, residuos: list[int], modulos: list[int]):
@@ -425,3 +423,47 @@ class Congruencias:
 
         resposta = sum(residuo * m_i_aux * m_i_inv_aux for residuo, m_i_aux, m_i_inv_aux in zip(self.residuos, m_i, m_i_inv))
         return resposta % m
+
+
+class CifraCesar:
+
+    def __init__(self, chave: int, alfabeto: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
+        _Validar.inteiros(chave)
+        if not isinstance(alfabeto, str) or not alfabeto:
+            raise ValueError("O alfabeto deve ser uma string não vazia.")
+
+        self.alfabeto = alfabeto
+        self.n = len(alfabeto)
+        self.chave = chave
+
+        self._mapa_indices = {char: i for i, char in enumerate(alfabeto)}
+
+    def cifrar(self, texto: str) -> str:
+        resultado = []
+        
+        for char in texto.upper():
+            if char in self._mapa_indices:
+                x = self._mapa_indices[char]
+                y = (x + self.chave) % self.n
+                novo_char = self.alfabeto[y]
+                
+                resultado.append(novo_char)
+            else:
+                resultado.append(char) # Mantém espaços
+                
+        return "".join(resultado)
+
+    def decifrar(self, cifra: str) -> str:
+        resultado = []
+
+        for char in cifra.upper():
+            if char in self._mapa_indices:
+                y = self._mapa_indices[char]
+                x = (y - self.chave) % self.n
+                novo_char = self.alfabeto[x]
+
+                resultado.append(novo_char)
+            else:
+                resultado.append(char)
+
+        return "".join(resultado)
