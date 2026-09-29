@@ -1,4 +1,4 @@
-from criptolib import InteiroModular, Matriz, Congruencias
+from criptolib.math import InteiroModular, Matriz, Congruencias
 
 
 def obter_inteiro(mensagem: str) -> int:
@@ -59,15 +59,16 @@ def menu_aritmetica_modular():
             try:
                 elem_a = InteiroModular(a, n)
                 if opcao == "1":
-                    print(f"\nResultado: {elem_a.adicao(b)}")
+                    # Adicionado .valor para imprimir o número em vez do objeto
+                    print(f"\nResultado: {elem_a.adicao(b).valor}")
                 elif opcao == "2":
-                    print(f"\nResultado: {elem_a.subtracao(b)}")
+                    print(f"\nResultado: {elem_a.subtracao(b).valor}")
                 elif opcao == "3":
-                    print(f"\nResultado: {elem_a.multiplicacao(b)}")
+                    print(f"\nResultado: {elem_a.multiplicacao(b).valor}")
                 elif opcao == "4":
-                    print(f"\nResultado: {elem_a.divisao_modular(b)}")
+                    print(f"\nResultado: {elem_a.divisao_modular(b).valor}")
                 elif opcao == "5":
-                    print(f"\nResultado: {elem_a.exponenciacao(b)}")
+                    print(f"\nResultado: {elem_a.exponenciacao(b).valor}")
             except Exception as erro:
                 print(f"\n[ERRO NA OPERAÇÃO] {erro}")
 
@@ -76,7 +77,8 @@ def menu_aritmetica_modular():
             n = obter_inteiro("Digite o valor do módulo n: ")
             try:
                 elem_a = InteiroModular(a, n)
-                print(f"\nResultado: {elem_a.inverso_modular()}")
+                # Adicionado .valor para imprimir o número
+                print(f"\nResultado: {elem_a.inverso_modular().valor}")
             except Exception as erro:
                 print(f"\n[ERRO NA OPERAÇÃO] {erro}")
         else:
