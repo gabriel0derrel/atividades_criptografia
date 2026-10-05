@@ -1,95 +1,195 @@
-from criptolib import AritmeticaModular, TeoriaDosNumeros
+from criptolib.math import InteiroModular, Matriz, Congruencias
 
 
-print("=== ARITMÉTICA MODULAR ===")
-
-a = 17
-b = 8
-n = 5
-
-print(f"Adição: {a} + {b} mod {n} =", AritmeticaModular.adicao(a, b, n))
-
-print(f"Subtração: {a} - {b} mod {n} =", AritmeticaModular.subtracao(a, b, n))
-
-print(f"Multiplicação: {a} * {b} mod {n} =", AritmeticaModular.multiplicacao(a, b, n))
-
-print(f"Divisão Modular: {a} / {b} mod {n} =", AritmeticaModular.divisao_modular(a, b, n))
-
-print(f"Potenciação: {a}^{b} mod {n} =", AritmeticaModular.exponenciacao(a, b, n))
-print(f"Potenciação Bruta: ({a}**{b}) % {n} =", (a**b)%n)
-
-print(f"Inverso Modular: {a}^(-1) mod {n} =", AritmeticaModular.inverso_modular(a, n))
+def obter_inteiro(mensagem: str) -> int:
+    """Função auxiliar para garantir que o usuário digite um número inteiro."""
+    while True:
+        try:
+            return int(input(mensagem))
+        except ValueError:
+            print("[ERRO DE DIGITAÇÃO] Por favor, digite um número inteiro válido.")
 
 
-print("\n=== NUMEROS PRIMOS ===")
-
-print("2 é primo: ",TeoriaDosNumeros.e_primo(2))    # é pra dar True
-
-print("3 é primo: ",TeoriaDosNumeros.e_primo(3))    # é pra dar True
-
-print("17 é primo: ",TeoriaDosNumeros.e_primo(17))   # é pra dar True
-
-print("25 é primo: ",TeoriaDosNumeros.e_primo(25))   # é pra dar False
-
-print("97 é primo: ",TeoriaDosNumeros.e_primo(97))   # é pra dar True
-
-print("1 é primo: ",TeoriaDosNumeros.e_primo(1))    # é pra dar False
-
-print("0 é primo: ",TeoriaDosNumeros.e_primo(0))    # é pra dar False
-
-print("-5 é primo: ",TeoriaDosNumeros.e_primo(-5))   # é pra dar False
-
-
-print("\n=== MDC POR TENTATIVA ===")
-
-print("MDC(60, 24):", TeoriaDosNumeros.mdc(60, 24))
-
-print("MDC(-60, 24):", TeoriaDosNumeros.mdc(-60, 24))
-
-print("MDC(25, 0):", TeoriaDosNumeros.mdc(25, 0))
+def obter_matriz(ordem: int) -> list[list[int]]:
+    """Função auxiliar para ler uma matriz quadrada do usuário."""
+    matriz = []
+    print(
+        f"\nDigite os elementos da matriz {ordem}x{ordem} (linha por linha, separados por espaço):"
+    )
+    for i in range(ordem):
+        while True:
+            try:
+                linha = input(f"Linha {i+1}: ").strip().split()
+                linha_ints = [int(x) for x in linha]
+                if len(linha_ints) != ordem:
+                    print(
+                        f"[ERRO DE DIGITAÇÃO] Você deve digitar exatamente {ordem} números separados por espaço."
+                    )
+                    continue
+                matriz.append(linha_ints)
+                break
+            except ValueError:
+                print("[ERRO DE DIGITAÇÃO] Por favor, digite apenas números inteiros.")
+    return matriz
 
 
-print("\n=== ALGORITMO DE EUCLIDES ===")
+def menu_aritmetica_modular():
+    while True:
+        print("\n" + "=" * 30)
+        print("=== SUB-MENU: ARITMÉTICA MODULAR ===")
+        print("1. Adição (a + b mod n)")
+        print("2. Subtração (a - b mod n)")
+        print("3. Multiplicação (a * b mod n)")
+        print("4. Divisão Modular (a / b mod n)")
+        print("5. Potenciação (a^b mod n)")
+        print("6. Inverso Modular (a^-1 mod n)")
+        print("0. Voltar ao Menu Principal")
+        print("=" * 30)
 
-print("Euclides(60, 24):", TeoriaDosNumeros.euclides(60, 24))
+        opcao = input("Escolha uma opção: ")
 
-print("Euclides(-60, 24):", TeoriaDosNumeros.euclides(-60, 24))
+        if opcao == "0":
+            break
 
-print("Euclides(25, 0):", TeoriaDosNumeros.euclides(25, 0))
+        if opcao in ["1", "2", "3", "4", "5"]:
+            a = obter_inteiro("Digite o valor de a: ")
+            b = obter_inteiro("Digite o valor de b: ")
+            n = obter_inteiro("Digite o valor do módulo n: ")
+
+            try:
+                elem_a = InteiroModular(a, n)
+                if opcao == "1":
+                    # Adicionado .valor para imprimir o número em vez do objeto
+                    print(f"\nResultado: {elem_a.adicao(b).valor}")
+                elif opcao == "2":
+                    print(f"\nResultado: {elem_a.subtracao(b).valor}")
+                elif opcao == "3":
+                    print(f"\nResultado: {elem_a.multiplicacao(b).valor}")
+                elif opcao == "4":
+                    print(f"\nResultado: {elem_a.divisao_modular(b).valor}")
+                elif opcao == "5":
+                    print(f"\nResultado: {elem_a.exponenciacao(b).valor}")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        elif opcao == "6":
+            a = obter_inteiro("Digite o valor de a: ")
+            n = obter_inteiro("Digite o valor do módulo n: ")
+            try:
+                elem_a = InteiroModular(a, n)
+                # Adicionado .valor para imprimir o número
+                print(f"\nResultado: {elem_a.inverso_modular().valor}")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+        else:
+            print("\nOpção inválida. Tente novamente.")
 
 
-print("\n=== EUCLIDES ESTENDIDO ===")
+def menu_principal():
+    while True:
+        print("\n" + "=" * 30)
+        print("=== MENU PRINCIPAL: CRIPTOLIB ===")
+        print("1. Aritmética Modular (Sub-menu)")
+        print("2. Verificar Número Primo")
+        print("3. MDC")
+        print("4. Euclides Estendido")
+        print("5. Função Phi de Euler")
+        print("6. Teorema Chinês do Resto")
+        print("7. Determinante de Matriz")
+        print("8. Inversa de Matriz")
+        print("9. Inversa Modular da Matriz")
+        print("0. Sair")
+        print("=" * 30)
 
-mdc, x, y = TeoriaDosNumeros.euclides_estendido(60, 24)
+        opcao = input("Escolha uma opção: ")
 
-print("Entrada: a = 60, b = 24")
-print("MDC:", mdc)
-print("x:", x)
-print("y:", y)
-print(f"Verificação: 60 * ({x}) + 24 * ({y}) =", 60 * x + 24 * y)
+        if opcao == "0":
+            print("\nEncerrando o programa...")
+            break
 
-mdc, x, y = TeoriaDosNumeros.euclides_estendido(-60, 24)
+        elif opcao == "1":
+            menu_aritmetica_modular()
 
-print("\nEntrada: a = -60, b = 24")
-print("MDC:", mdc)
-print("x:", x)
-print("y:", y)
-print(f"Verificação: (-60) * ({x}) + 24 * ({y}) =", -60 * x + 24 * y)
+        elif opcao == "2":
+            num = obter_inteiro("Digite o número para verificar: ")
+            try:
+                resultado = InteiroModular.e_primo(num)
+                print(f"\nO número {num} é primo? {resultado}")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
 
-print("\n=== FUNÇÃO PHI DE EULER ===")
+        elif opcao in ["3", "4"]:
+            a = obter_inteiro("Digite o valor de a: ")
+            b = obter_inteiro("Digite o valor de b: ")
+            try:
+                if opcao == "3":
+                    print(f"\nMDC({a}, {b}): {InteiroModular.mdc(a, b)}")
+                elif opcao == "4":
+                    mdc, x, y = InteiroModular.euclides_estendido(a, b)
+                    print(f"\nResultado -> MDC: {mdc} | x: {x} | y: {y}")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
 
-print("ϕ(4) =", TeoriaDosNumeros.phi_de_euler(4))
-print("ϕ(7) =", TeoriaDosNumeros.phi_de_euler(7))
-print("ϕ(10) =", TeoriaDosNumeros.phi_de_euler(10))
-print("ϕ(26) =", TeoriaDosNumeros.phi_de_euler(26))
-print("ϕ(32) =", TeoriaDosNumeros.phi_de_euler(32))
+        elif opcao == "5":
+            n = obter_inteiro("Digite o valor de n para calcular ϕ(n): ")
+            try:
+                print(f"\nϕ({n}) = {InteiroModular.phi_de_euler(n)}")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
 
-print("\n=== TEOREMA CHINÊS DO RESTO ===")
+        elif opcao == "6":
+            try:
+                qtd = obter_inteiro("Quantas congruências tem o sistema? ")
+                if qtd <= 0:
+                    print("\n[ERRO] O número de congruências deve ser positivo.")
+                    continue
 
-residuos = [4, 3, 5]
-modulos = [5, 7, 16]
+                residuos = []
+                modulos = []
 
-print(f"x ≡ {residuos[0]} mod {modulos[0]}")
-print(f"x ≡ {residuos[1]} mod {modulos[1]}")
-print(f"x ≡ {residuos[2]} mod {modulos[2]}")
-print(f"Resultado: x =", AritmeticaModular.chines_resto(residuos, modulos))
+                print("\nInsira os valores no formato (x ≡ resíduo mod módulo):")
+                for i in range(qtd):
+                    res = obter_inteiro(f"Resíduo {i+1}: ")
+                    mod = obter_inteiro(f"Módulo {i+1}: ")
+                    residuos.append(res)
+                    modulos.append(mod)
+
+                sistema = Congruencias(residuos, modulos)
+                resultado = sistema.resolver()
+                print(f"\nResultado: x = {resultado}")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        elif opcao in ["7", "8", "9"]:
+            ordem = obter_inteiro(
+                "Digite a ordem da matriz quadrada (ex: 3 para 3x3): "
+            )
+            if ordem <= 0:
+                print("\n[ERRO] A ordem da matriz deve ser um número positivo.")
+                continue
+
+            dados_matriz = obter_matriz(ordem)
+
+            try:
+                matriz = Matriz(dados_matriz)
+                if opcao == "7":
+                    resultado = matriz.determinante()
+                    print(f"\nO determinante da matriz é: {resultado}")
+                elif opcao == "8":
+                    matriz_inversa = matriz.inversa()
+                    print(f"\nA matriz inversa é:\n{matriz_inversa.dados}")
+                elif opcao == "9":
+                    n = obter_inteiro("Digite o valor do módulo n: ")
+                    matriz_inversa_mod = matriz.inversa_modular(n)
+                    print(
+                        f"\nA matriz inversa no módulo {n} é:\n{matriz_inversa_mod.dados}"
+                    )
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        else:
+            print("\nOpção inválida. Tente novamente.")
+
+
+if __name__ == "__main__":
+    menu_principal()
