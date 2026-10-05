@@ -1,4 +1,4 @@
-from criptolib.cifras.classicas import Cesar, Afim, Hill
+from criptolib.cifras.classicas import Cesar, Afim, Hill, AutoChave
 
 
 def obter_inteiro(mensagem: str) -> int:
@@ -40,6 +40,7 @@ def menu_cifras():
         print("1. Cifra de César")
         print("2. Cifra Afim")
         print("3. Cifra de Hill")
+        print("4. Cifra de Autochave")
         print("0. Sair")
         print("=" * 30)
 
@@ -101,6 +102,30 @@ def menu_cifras():
             try:
                 cifra = Hill(chave_matriz)
                 
+                acao = input("Deseja (1) Cifrar ou (2) Decifrar? ")
+                if acao == "1":
+                    texto = input("Digite a mensagem para cifrar: ")
+                    print(f"\nResultado: {cifra.cifrar(texto)}")
+                elif acao == "2":
+                    texto = input("Digite a mensagem para decifrar: ")
+                    print(f"\nResultado: {cifra.decifrar(texto)}")
+                else:
+                    print("\n[ERRO] Ação inválida.")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        elif opcao == "4":
+            print("\n--- Cifra de Autochave ---")
+            chave = input("Digite o caractere ou o inteiro da chave inicial (K0): ").strip()
+
+            try:
+                try:
+                    chave = int(chave)
+                except ValueError:
+                    pass
+
+                cifra = AutoChave(chave)
+
                 acao = input("Deseja (1) Cifrar ou (2) Decifrar? ")
                 if acao == "1":
                     texto = input("Digite a mensagem para cifrar: ")
