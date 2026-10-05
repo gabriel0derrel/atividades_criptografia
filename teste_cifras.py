@@ -1,4 +1,4 @@
-from criptolib.cifras.classicas import Cesar, Afim, Hill, AutoChave
+from criptolib.cifras.classicas import Cesar, Afim, Hill, AutoChave, Fluxo
 
 
 def obter_inteiro(mensagem: str) -> int:
@@ -41,6 +41,7 @@ def menu_cifras():
         print("2. Cifra Afim")
         print("3. Cifra de Hill")
         print("4. Cifra de Autochave")
+        print("5. Cifra de Fluxo")
         print("0. Sair")
         print("=" * 30)
 
@@ -125,6 +126,25 @@ def menu_cifras():
                     pass
 
                 cifra = AutoChave(chave)
+
+                acao = input("Deseja (1) Cifrar ou (2) Decifrar? ")
+                if acao == "1":
+                    texto = input("Digite a mensagem para cifrar: ")
+                    print(f"\nResultado: {cifra.cifrar(texto)}")
+                elif acao == "2":
+                    texto = input("Digite a mensagem para decifrar: ")
+                    print(f"\nResultado: {cifra.decifrar(texto)}")
+                else:
+                    print("\n[ERRO] Ação inválida.")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        elif opcao == "5":
+            print("\n--- Cifra de Fluxo ---")
+            seed = obter_inteiro("Digite o valor da semente (seed) para o gerador de números aleatórios: ")
+
+            try:
+                cifra = Fluxo(seed)
 
                 acao = input("Deseja (1) Cifrar ou (2) Decifrar? ")
                 if acao == "1":
