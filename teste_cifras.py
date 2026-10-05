@@ -1,4 +1,4 @@
-from criptolib.cifras.classicas import Cesar, Afim, Hill, AutoChave, Fluxo
+from criptolib.cifras.classicas import Cesar, Afim, Hill, AutoChave, Fluxo, Vigenere
 
 
 def obter_inteiro(mensagem: str) -> int:
@@ -42,6 +42,7 @@ def menu_cifras():
         print("3. Cifra de Hill")
         print("4. Cifra de Autochave")
         print("5. Cifra de Fluxo")
+        print("6. Cifra de Vigenère")
         print("0. Sair")
         print("=" * 30)
 
@@ -145,6 +146,25 @@ def menu_cifras():
 
             try:
                 cifra = Fluxo(seed)
+
+                acao = input("Deseja (1) Cifrar ou (2) Decifrar? ")
+                if acao == "1":
+                    texto = input("Digite a mensagem para cifrar: ")
+                    print(f"\nResultado: {cifra.cifrar(texto)}")
+                elif acao == "2":
+                    texto = input("Digite a mensagem para decifrar: ")
+                    print(f"\nResultado: {cifra.decifrar(texto)}")
+                else:
+                    print("\n[ERRO] Ação inválida.")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        elif opcao == "6":
+            print("\n--- Cifra de Vigenère ---")
+            chave = input("Digite a palavra-chave: ").strip()
+
+            try:
+                cifra = Vigenere(chave)
 
                 acao = input("Deseja (1) Cifrar ou (2) Decifrar? ")
                 if acao == "1":
