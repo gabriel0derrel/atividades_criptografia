@@ -1,5 +1,5 @@
 from criptolib.cifras.classicas import (
-    Cesar, Afim, Hill, AutoChave, Fluxo, Vigenere, Substituicao
+    Cesar, Afim, Hill, AutoChave, Fluxo, Vigenere, Substituicao, Transposicao
 )
 
 
@@ -46,6 +46,7 @@ def menu_cifras():
         print("5. Cifra de Fluxo")
         print("6. Cifra de Vigenère")
         print("7. Cifra de Substituição")
+        print("8. Cifra de Transposição")
         print("0. Sair")
         print("=" * 30)
 
@@ -189,6 +190,25 @@ def menu_cifras():
 
             try:
                 cifra = Substituicao(chave)
+
+                acao = input("Deseja (1) Cifrar ou (2) Decifrar? ")
+                if acao == "1":
+                    texto = input("Digite a mensagem para cifrar: ")
+                    print(f"\nResultado: {cifra.cifrar(texto)}")
+                elif acao == "2":
+                    texto = input("Digite a mensagem para decifrar: ")
+                    print(f"\nResultado: {cifra.decifrar(texto)}")
+                else:
+                    print("\n[ERRO] Ação inválida.")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        elif opcao == "8":
+            print("\n--- Cifra de Transposição ---")
+            chave = input("Digite a palavra-chave: ").strip()
+
+            try:
+                cifra = Transposicao(chave)
 
                 acao = input("Deseja (1) Cifrar ou (2) Decifrar? ")
                 if acao == "1":
