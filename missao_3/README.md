@@ -26,20 +26,26 @@ chave = f"{int('133457799BBCDFF1', 16):064b}"
 texto = f"{int('0123456789ABCDEF', 16):064b}"
 
 cifra = Des(chave)
-criptografado = cifra.cifrar(texto)
-original = cifra.decifrar(criptografado)
+criptografado = cifra.cifrar_bits(texto)
+original = cifra.decifrar_bits(criptografado)
 ```
 
-As entradas e saídas são strings de bits. A mensagem deve ter tamanho múltiplo
-de 64 bits; esta prova de conceito não adiciona padding nem define modo de
-operação. O teste usa o vetor conhecido que produz `85E813540F0AB405`.
+Os métodos `cifrar_bits` e `decifrar_bits` recebem e devolvem strings binárias.
+As mensagens devem ter tamanho múltiplo de 64 bits. Os métodos `cifrar` e
+`decifrar` permanecem disponíveis como aliases para manter compatibilidade.
+
+Para cifrar texto UTF-8, `cifrar_texto` retorna uma string hexadecimal contendo
+o IV de 8 bytes seguido do texto cifrado em CBC. `decifrar_texto` recebe esse
+pacote e recupera o texto original. O padding utilizado é PKCS#7. O teste usa
+o vetor conhecido que produz `85E813540F0AB405`.
 
 ## Limitação de segurança
 
 DES é legado e não deve proteger documentos reais no SecureDocs: sua chave
 efetiva de 56 bits é vulnerável a busca exaustiva e seu bloco de 64 bits é
-pequeno para grandes volumes. Esta implementação serve apenas para estudo e
-validação do algoritmo; não fornece autenticação nem integridade.
+pequeno para grandes volumes. CBC com IV aleatório não autentica o conteúdo nem
+detecta alterações no pacote. Esta implementação serve apenas para estudo e
+validação do algoritmo; não deve ser utilizada para proteger dados reais.
 
 Execute os testes do repositório com:
 

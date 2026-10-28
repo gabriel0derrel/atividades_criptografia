@@ -1,3 +1,7 @@
+import secrets
+import string
+
+
 class Des:
     _IP = (
         58, 50, 42, 34, 26, 18, 10, 2,
@@ -180,8 +184,87 @@ class Des:
             resultado.append(f"{cifrado:064b}")
         return "".join(resultado)
 
-    def cifrar(self, texto: str) -> str:
-        return self._processar(texto, self._subchaves)
+    def cifrar_bits(self, mensagem: str) -> str:
+        return self._processar(mensagem, self._subchaves)
+
+    def decifrar_bits(self, cifra: str) -> str:
+        return self._processar(cifra, tuple(reversed(self._subchaves)))
+
+    def cifrar(self, mensagem: str) -> str:
+        return self.cifrar_bits(mensagem)
 
     def decifrar(self, cifra: str) -> str:
-        return self._processar(cifra, tuple(reversed(self._subchaves)))
+        return self.decifrar_bits(cifra)
+
+    def cifrar_texto(self, texto: str) -> str:
+        if not isinstance(texto, str):
+            raise TypeError("O texto deve ser uma string.")
+
+        dados = texto.encode("utf-8")
+        quantidade_padding = 8 - len(dados) % 8
+        dados += bytes([quantidade_padding]) * quantidade_padding
+
+        iv = secrets.token_bytes(8)
+        anterior = iv
+        saida = bytearray()
+
+        for inicio in range(0, len(dados), 8):
+            bloco = dados[inicio:inicio + 8]
+            combinado = bytes(a ^ b for a, b in zip(bloco, anterior))
+            valor = self._processar_bloco(
+                int.from_bytes(combinado, "big"),
+                self._subchaves,
+            )
+            bloco_cifrado = valor.to_bytes(8, "big")
+            saida.extend(bloco_cifrado)
+            anterior = bloco_cifrado
+
+        return (iv + saida).hex()
+
+    def decifrar_texto(self, pacote_hex: str) -> str:
+        if not isinstance(pacote_hex, str):
+            raise TypeError("O pacote cifrado deve ser uma string hexadecimal.")
+        if any(caractere not in string.hexdigits for caractere in pacote_hex):
+            raise ValueError("O pacote deve conter somente caracteres hexadecimais.")
+        if len(pacote_hex) % 2 != 0:
+            raise ValueError("O pacote hexadecimal deve conter pares de caracteres.")
+
+        pacote = bytes.fromhex(pacote_hex)
+        if len(pacote) < 16 or len(pacote) % 8 != 0:
+            raise ValueError(
+                "O pacote deve conter 8 bytes de IV e pelo menos "
+                "um bloco cifrado de 8 bytes."
+            )
+
+        iv = pacote[:8]
+        anterior = iv
+        dados = bytearray()
+        subchaves = tuple(reversed(self._subchaves))
+
+        for inicio in range(8, len(pacote), 8):
+            bloco_cifrado = pacote[inicio:inicio + 8]
+            valor = self._processar_bloco(
+                int.from_bytes(bloco_cifrado, "big"),
+                subchaves,
+            )
+            bloco_decifrado = valor.to_bytes(8, "big")
+            dados.extend(a ^ b for a, b in zip(bloco_decifrado, anterior))
+            anterior = bloco_cifrado
+
+        quantidade_padding = dados[-1]
+        if (
+            not 1 <= quantidade_padding <= 8
+            or dados[-quantidade_padding:]
+            != bytes([quantidade_padding]) * quantidade_padding
+        ):
+            raise ValueError(
+                "Preenchimento inválido; verifique a chave ou o pacote."
+            )
+
+        try:
+            return bytes(dados[:-quantidade_padding]).decode("utf-8")
+        except UnicodeDecodeError as erro:
+            raise ValueError(
+                "O conteúdo decifrado não é UTF-8 válido; "
+                "verifique a chave ou o pacote."
+            ) from erro
