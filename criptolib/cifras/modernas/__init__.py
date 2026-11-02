@@ -1,4 +1,5 @@
-from .des import Des
-from .sdes import Sdes
+from .des import DES
+from .sdes import SDES
+from .aes import AES
 
-__all__ = ["Des", "Sdes"]
+__all__ = ["DES", "SDES", "AES"]

@@ -1,10 +1,13 @@
-from criptolib.cifras.modernas.sdes import Sdes
+from criptolib.cifras.modernas import SDES, DES, AES
+
 
 def menu_cifras():
     while True:
         print("\n" + "=" * 30)
         print("=== MENU PRINCIPAL: CIFRAS ===")
         print("1. Cifra S-DES")
+        print("2. Cifra DES")
+        print("3. Cifra AES")
         print("0. Sair")
         print("=" * 30)
 
@@ -17,11 +20,11 @@ def menu_cifras():
         elif opcao == "1":
             print("\n--- Cifra S-DES ---")
             chave = input("Digite a chave (10 bits): ").strip()
-            
-            try:
-                cifra = Sdes(chave)
 
-                acao = input("Deseja (1) Cifrar ou (2) Decifrar? ")
+            try:
+                cifra = SDES(chave)
+
+                acao = input("Deseja (1) Cifrar ou (2) Decifrar? ").strip()
                 if acao == "1":
                     texto = input(
                         "Digite a mensagem binária para cifrar "
@@ -36,6 +39,68 @@ def menu_cifras():
                     print(f"\nResultado: {cifra.decifrar(texto)}")
                 else:
                     print("\n[ERRO] Ação inválida.")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        elif opcao == "2":
+            print("\n--- Cifra DES ---")
+            chave = input("Digite a chave binária (64 bits): ").strip()
+
+            try:
+                cifra = DES(chave)
+
+                print("\nSelecione o modo de operação:")
+                print("1. Cifrar bits (binário)")
+                print("2. Decifrar bits (binário)")
+                print("3. Cifrar texto (modo CBC com IV)")
+                print("4. Decifrar texto (modo CBC com IV)")
+                modo = input("Opção: ").strip()
+
+                if modo == "1":
+                    texto = input("Digite a mensagem binária (múltiplo de 64 bits): ").strip()
+                    print(f"\nResultado: {cifra.cifrar_bits(texto)}")
+                elif modo == "2":
+                    texto = input("Digite a cifra binária (múltiplo de 64 bits): ").strip()
+                    print(f"\nResultado: {cifra.decifrar_bits(texto)}")
+                elif modo == "3":
+                    texto = input("Digite o texto legível: ")
+                    print(f"\nResultado (Hex): {cifra.cifrar_texto(texto)}")
+                elif modo == "4":
+                    pacote_hex = input("Digite o pacote hexadecimal: ").strip()
+                    print(f"\nResultado: {cifra.decifrar_texto(pacote_hex)}")
+                else:
+                    print("\n[ERRO] Opção de modo inválida.")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        elif opcao == "3":
+            print("\n--- Cifra AES ---")
+            chave = input("Digite a chave binária (128, 192 ou 256 bits): ").strip()
+
+            try:
+                cifra = AES(chave)
+
+                print("\nSelecione o modo de operação:")
+                print("1. Cifrar bits (binário)")
+                print("2. Decifrar bits (binário)")
+                print("3. Cifrar texto (modo CBC com IV)")
+                print("4. Decifrar texto (modo CBC com IV)")
+                modo = input("Opção: ").strip()
+
+                if modo == "1":
+                    texto = input("Digite a mensagem binária (múltiplo de 128 bits): ").strip()
+                    print(f"\nResultado: {cifra.cifrar_bits(texto)}")
+                elif modo == "2":
+                    texto = input("Digite a cifra binária (múltiplo de 128 bits): ").strip()
+                    print(f"\nResultado: {cifra.decifrar_bits(texto)}")
+                elif modo == "3":
+                    texto = input("Digite o texto legível: ")
+                    print(f"\nResultado (Hex): {cifra.cifrar_texto(texto)}")
+                elif modo == "4":
+                    pacote_hex = input("Digite o pacote hexadecimal: ").strip()
+                    print(f"\nResultado: {cifra.decifrar_texto(pacote_hex)}")
+                else:
+                    print("\n[ERRO] Opção de modo inválida.")
             except Exception as erro:
                 print(f"\n[ERRO NA OPERAÇÃO] {erro}")
 
