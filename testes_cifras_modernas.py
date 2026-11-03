@@ -1,4 +1,4 @@
-from criptolib.cifras.modernas import SDES, DES, AES
+from criptolib.cifras.modernas import SDES, DES, AES, RC5
 
 
 def menu_cifras():
@@ -8,6 +8,7 @@ def menu_cifras():
         print("1. Cifra S-DES")
         print("2. Cifra DES")
         print("3. Cifra AES")
+        print("4. Cifra RC5")
         print("0. Sair")
         print("=" * 30)
 
@@ -101,6 +102,30 @@ def menu_cifras():
                     print(f"\nResultado: {cifra.decifrar_texto(pacote_hex)}")
                 else:
                     print("\n[ERRO] Opção de modo inválida.")
+            except Exception as erro:
+                print(f"\n[ERRO NA OPERAÇÃO] {erro}")
+
+        elif opcao == "4":
+            print("\n--- Cifra RC5 ---")
+            chave = input("Digite a chave binária (múltiplo de 8 bits): ").strip()
+
+            try:
+                cifra = RC5(chave)
+
+                print("\nParâmetros: RC5-32/12 (blocos de 64 bits).")
+                acao = input("Deseja (1) Cifrar ou (2) Decifrar? ").strip()
+                if acao == "1":
+                    texto = input(
+                        "Digite a mensagem binária (múltiplo de 64 bits): "
+                    ).strip()
+                    print(f"\nResultado: {cifra.cifrar_bits(texto)}")
+                elif acao == "2":
+                    texto = input(
+                        "Digite a cifra binária (múltiplo de 64 bits): "
+                    ).strip()
+                    print(f"\nResultado: {cifra.decifrar_bits(texto)}")
+                else:
+                    print("\n[ERRO] Ação inválida.")
             except Exception as erro:
                 print(f"\n[ERRO NA OPERAÇÃO] {erro}")
 
