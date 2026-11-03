@@ -40,6 +40,25 @@ As mensagens devem ter tamanho múltiplo do tamanho de bloco do algoritmo corres
 
 Para cifrar texto UTF-8, o método `cifrar_texto` retorna uma string hexadecimal contendo o vetor de inicialização (IV) seguido do texto cifrado em modo CBC. O método `decifrar_texto` recebe esse pacote e recupera o texto original. O preenchimento (padding) utilizado segue o padrão PKCS#7.
 
+## Experimento com arquivos usando AES
+
+Os métodos `cifrar_arquivo` e `decifrar_arquivo` permitem demonstrar o ciclo
+arquivo original → AES → arquivo cifrado → AES → arquivo recuperado. O arquivo
+cifrado contém o IV aleatório de 16 bytes seguido dos blocos cifrados. Os arquivos
+originais não são modificados; use caminhos de saída diferentes.
+
+```python
+from criptolib.cifras.modernas import AES
+
+chave = AES("0" * 128)
+chave.cifrar_arquivo("documento.pdf", "documento.pdf.aes")
+chave.decifrar_arquivo("documento.pdf.aes", "documento_recuperado.pdf")
+```
+
+Compare os bytes de `documento.pdf` e `documento_recuperado.pdf` para verificar
+que o conteúdo foi recuperado sem alterações. O teste automatizado desse fluxo
+pode ser executado com `py -m unittest discover -v`.
+
 ## Limitação de segurança
 
 O DES e o S-DES são algoritmos legados/educacionais e não devem proteger documentos reais no SecureDocs. O DES possui chave efetiva de 56 bits vulnerável a busca exaustiva e blocos de 64 bits pequenos para grandes volumes. O modo CBC com IV aleatório sem autenticação associada não detecta alterações no pacote. Estas implementações servem apenas para estudo e validação dos algoritmos e não devem ser utilizadas em ambiente de produção.

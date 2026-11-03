@@ -1,5 +1,6 @@
 import secrets
 import string
+from pathlib import Path
 
 
 class AES:
@@ -201,6 +202,85 @@ class AES:
 
     def decifrar(self, cifra: str) -> str:
         return self.decifrar_bits(cifra)
+
+    @staticmethod
+    def _validar_caminhos_arquivo(
+        arquivo_entrada: str | Path,
+        arquivo_saida: str | Path,
+    ) -> tuple[Path, Path]:
+        entrada = Path(arquivo_entrada)
+        saida = Path(arquivo_saida)
+        if entrada.resolve() == saida.resolve():
+            raise ValueError("Os caminhos de entrada e saída devem ser diferentes.")
+        return entrada, saida
+
+    def cifrar_arquivo(
+        self,
+        arquivo_entrada: str | Path,
+        arquivo_saida: str | Path,
+    ) -> None:
+        entrada, saida = self._validar_caminhos_arquivo(
+            arquivo_entrada,
+            arquivo_saida,
+        )
+        dados = entrada.read_bytes()
+        quantidade_padding = self._TAMANHO_BLOCO - (
+            len(dados) % self._TAMANHO_BLOCO
+        )
+        dados += bytes([quantidade_padding]) * quantidade_padding
+
+        iv = secrets.token_bytes(self._TAMANHO_BLOCO)
+        anterior = iv
+        cifra = bytearray()
+
+        for inicio in range(0, len(dados), self._TAMANHO_BLOCO):
+            bloco = dados[inicio:inicio + self._TAMANHO_BLOCO]
+            combinado = bytes(a ^ b for a, b in zip(bloco, anterior))
+            bloco_cifrado = self._cifrar_bloco(combinado)
+            cifra.extend(bloco_cifrado)
+            anterior = bloco_cifrado
+
+        saida.write_bytes(iv + cifra)
+
+    def decifrar_arquivo(
+        self,
+        arquivo_entrada: str | Path,
+        arquivo_saida: str | Path,
+    ) -> None:
+        entrada, saida = self._validar_caminhos_arquivo(
+            arquivo_entrada,
+            arquivo_saida,
+        )
+        pacote = entrada.read_bytes()
+        if len(pacote) < 2 * self._TAMANHO_BLOCO or (
+            len(pacote) % self._TAMANHO_BLOCO != 0
+        ):
+            raise ValueError(
+                "O arquivo cifrado deve conter um IV e ao menos "
+                "um bloco cifrado AES."
+            )
+
+        iv = pacote[:self._TAMANHO_BLOCO]
+        anterior = iv
+        dados = bytearray()
+
+        for inicio in range(self._TAMANHO_BLOCO, len(pacote), self._TAMANHO_BLOCO):
+            bloco_cifrado = pacote[inicio:inicio + self._TAMANHO_BLOCO]
+            bloco_decifrado = self._decifrar_bloco(bloco_cifrado)
+            dados.extend(a ^ b for a, b in zip(bloco_decifrado, anterior))
+            anterior = bloco_cifrado
+
+        quantidade_padding = dados[-1]
+        if (
+            not 1 <= quantidade_padding <= self._TAMANHO_BLOCO
+            or dados[-quantidade_padding:]
+            != bytes([quantidade_padding]) * quantidade_padding
+        ):
+            raise ValueError(
+                "Preenchimento inválido; verifique a chave ou o arquivo cifrado."
+            )
+
+        saida.write_bytes(dados[:-quantidade_padding])
 
     def cifrar_texto(self, texto: str) -> str:
         if not isinstance(texto, str):
