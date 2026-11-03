@@ -67,6 +67,8 @@ de seleção de arquivos. A demonstração salva os arquivos cifrados em
 projeto. Informe a mesma chave hexadecimal na cifragem e na decifragem.
 Por exemplo, `000102030405060708090A0B0C0D0E0F` é uma chave AES-128 válida.
 O seletor aceita arquivos de qualquer extensão, incluindo PDF, DOCX e XLSX.
+Também é possível escolher uma pasta e sortear um arquivo entre os arquivos
+diretamente nela; subpastas não são incluídas no sorteio.
 
 ## Limitação de segurança
 

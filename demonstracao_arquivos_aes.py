@@ -1,4 +1,5 @@
 from pathlib import Path
+import secrets
 import string
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
@@ -46,20 +47,18 @@ def _caminho_disponivel(pasta: Path, nome: str) -> Path:
     return destino
 
 
-def _cifrar_arquivo(janela: tk.Tk) -> None:
-    arquivo = filedialog.askopenfilename(
-        title="Selecione o arquivo para cifrar",
-        filetypes=(("Todos os arquivos", "*.*"),),
-        parent=janela,
-    )
-    if not arquivo:
-        return
+def _sortear_arquivo(pasta: Path) -> Path:
+    arquivos = tuple(caminho for caminho in pasta.iterdir() if caminho.is_file())
+    if not arquivos:
+        raise FileNotFoundError("A pasta selecionada não contém arquivos.")
+    return secrets.choice(arquivos)
 
+
+def _cifrar_caminho(janela: tk.Tk, entrada: Path) -> None:
     cifra = _solicitar_cifra(janela)
     if cifra is None:
         return
 
-    entrada = Path(arquivo)
     try:
         _PASTA_CIFRADOS.mkdir(parents=True, exist_ok=True)
         saida = _caminho_disponivel(
@@ -76,6 +75,40 @@ def _cifrar_arquivo(janela: tk.Tk) -> None:
         f"Arquivo salvo em:\n{saida}",
         parent=janela,
     )
+
+
+def _cifrar_arquivo(janela: tk.Tk) -> None:
+    arquivo = filedialog.askopenfilename(
+        title="Selecione o arquivo para cifrar",
+        filetypes=(("Todos os arquivos", "*.*"),),
+        parent=janela,
+    )
+    if not arquivo:
+        return
+
+    _cifrar_caminho(janela, Path(arquivo))
+
+
+def _sortear_e_cifrar_arquivo(janela: tk.Tk) -> None:
+    pasta = filedialog.askdirectory(
+        title="Selecione a pasta para sortear um arquivo",
+        parent=janela,
+    )
+    if not pasta:
+        return
+
+    try:
+        entrada = _sortear_arquivo(Path(pasta))
+    except OSError as erro:
+        messagebox.showerror("Não foi possível sortear um arquivo", str(erro), parent=janela)
+        return
+
+    if messagebox.askyesno(
+        "Arquivo sorteado",
+        f"O arquivo sorteado foi:\n{entrada.name}\n\nDeseja cifrá-lo?",
+        parent=janela,
+    ):
+        _cifrar_caminho(janela, entrada)
 
 
 def _decifrar_arquivo(janela: tk.Tk) -> None:
@@ -122,13 +155,13 @@ def main() -> None:
     ttk.Label(
         conteudo,
         text=(
-            "Selecione um arquivo para cifrar ou um arquivo .sdocaes para "
-            "decifrar.\nOs arquivos de saída são salvos em pastas separadas "
-            "na pasta do projeto."
+            "Selecione um arquivo ou sorteie um arquivo de uma pasta para "
+            "cifrar.\nTambém é possível selecionar um arquivo .sdocaes para "
+            "decifrar."
         ),
         justify="center",
         wraplength=420,
-    ).grid(row=0, column=0, columnspan=2, pady=(0, 16))
+    ).grid(row=0, column=0, columnspan=3, pady=(0, 16))
 
     ttk.Button(
         conteudo,
@@ -138,9 +171,15 @@ def main() -> None:
 
     ttk.Button(
         conteudo,
+        text="Sortear arquivo de uma pasta",
+        command=lambda: _sortear_e_cifrar_arquivo(janela),
+    ).grid(row=1, column=1, padx=5)
+
+    ttk.Button(
+        conteudo,
         text="Selecionar arquivo para decifrar",
         command=lambda: _decifrar_arquivo(janela),
-    ).grid(row=1, column=1, padx=5)
+    ).grid(row=1, column=2, padx=5)
 
     janela.mainloop()
 

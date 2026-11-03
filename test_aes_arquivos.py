@@ -1,8 +1,10 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from criptolib.cifras.modernas import AES
+from demonstracao_arquivos_aes import _sortear_arquivo
 
 
 class TestesArquivosAES(unittest.TestCase):
@@ -98,6 +100,31 @@ class TestesArquivosAES(unittest.TestCase):
                 self.cifra.cifrar_arquivo(arquivo, arquivo)
 
             self.assertEqual(arquivo.read_bytes(), conteudo)
+
+    def test_sorteia_arquivo_existente_sem_incluir_subpastas(self):
+        with tempfile.TemporaryDirectory() as diretorio:
+            pasta = Path(diretorio)
+            arquivo = pasta / "documento.pdf"
+            subpasta = pasta / "subpasta"
+            arquivo.write_bytes(b"%PDF")
+            subpasta.mkdir()
+            (subpasta / "outro.pdf").write_bytes(b"%PDF")
+
+            with patch(
+                "demonstracao_arquivos_aes.secrets.choice",
+                return_value=arquivo,
+            ) as escolha:
+                resultado = _sortear_arquivo(pasta)
+
+            self.assertEqual(resultado, arquivo)
+            escolha.assert_called_once_with((arquivo,))
+
+    def test_sorteio_rejeita_pasta_sem_arquivos(self):
+        with tempfile.TemporaryDirectory() as diretorio:
+            pasta = Path(diretorio)
+
+            with self.assertRaises(FileNotFoundError):
+                _sortear_arquivo(pasta)
 
 
 if __name__ == "__main__":
