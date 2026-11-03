@@ -1,2 +1,4 @@
 __pycache__/
 .pytest_cache/
+arquivos_cifrados/
+arquivos_recuperados/

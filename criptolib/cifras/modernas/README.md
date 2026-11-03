@@ -44,7 +44,9 @@ Para cifrar texto UTF-8, o método `cifrar_texto` retorna uma string hexadecimal
 
 Os métodos `cifrar_arquivo` e `decifrar_arquivo` permitem demonstrar o ciclo
 arquivo original → AES → arquivo cifrado → AES → arquivo recuperado. O arquivo
-cifrado contém o IV aleatório de 16 bytes seguido dos blocos cifrados. Os arquivos
+cifrado contém uma assinatura de formato, o IV aleatório de 16 bytes e os blocos
+cifrados. A assinatura permite recusar arquivos comuns que não foram produzidos
+pela demonstração; não autentica o conteúdo nem detecta adulterações. Os arquivos
 originais não são modificados; use caminhos de saída diferentes.
 
 ```python
@@ -58,6 +60,13 @@ chave.decifrar_arquivo("documento.pdf.aes", "documento_recuperado.pdf")
 Compare os bytes de `documento.pdf` e `documento_recuperado.pdf` para verificar
 que o conteúdo foi recuperado sem alterações. O teste automatizado desse fluxo
 pode ser executado com `py -m unittest discover -v`.
+
+Também é possível executar `py demonstracao_arquivos_aes.py` para abrir a janela
+de seleção de arquivos. A demonstração salva os arquivos cifrados em
+`arquivos_cifrados/` e os recuperados em `arquivos_recuperados/`, na raiz do
+projeto. Informe a mesma chave hexadecimal na cifragem e na decifragem.
+Por exemplo, `000102030405060708090A0B0C0D0E0F` é uma chave AES-128 válida.
+O seletor aceita arquivos de qualquer extensão, incluindo PDF, DOCX e XLSX.
 
 ## Limitação de segurança
 

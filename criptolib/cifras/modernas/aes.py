@@ -13,6 +13,7 @@ class AES:
 
     _TAMANHO_BLOCO = 16
     _TAMANHOS_CHAVE = (128, 192, 256)
+    _ASSINATURA_ARQUIVO = b"SECUREDOCS-AES-CBC\x01"
     _POLINOMIO = 0x11B
     _S_BOX = (
         0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -240,7 +241,7 @@ class AES:
             cifra.extend(bloco_cifrado)
             anterior = bloco_cifrado
 
-        saida.write_bytes(iv + cifra)
+        saida.write_bytes(self._ASSINATURA_ARQUIVO + iv + cifra)
 
     def decifrar_arquivo(
         self,
@@ -252,20 +253,33 @@ class AES:
             arquivo_saida,
         )
         pacote = entrada.read_bytes()
-        if len(pacote) < 2 * self._TAMANHO_BLOCO or (
-            len(pacote) % self._TAMANHO_BLOCO != 0
+        tamanho_assinatura = len(self._ASSINATURA_ARQUIVO)
+        if not pacote.startswith(self._ASSINATURA_ARQUIVO):
+            raise ValueError(
+                "O arquivo selecionado não foi cifrado pela demonstração AES."
+            )
+
+        dados_cifrados = pacote[tamanho_assinatura:]
+        if len(dados_cifrados) < 2 * self._TAMANHO_BLOCO or (
+            len(dados_cifrados) % self._TAMANHO_BLOCO != 0
         ):
             raise ValueError(
                 "O arquivo cifrado deve conter um IV e ao menos "
                 "um bloco cifrado AES."
             )
 
-        iv = pacote[:self._TAMANHO_BLOCO]
+        iv = dados_cifrados[:self._TAMANHO_BLOCO]
         anterior = iv
         dados = bytearray()
 
-        for inicio in range(self._TAMANHO_BLOCO, len(pacote), self._TAMANHO_BLOCO):
-            bloco_cifrado = pacote[inicio:inicio + self._TAMANHO_BLOCO]
+        for inicio in range(
+            self._TAMANHO_BLOCO,
+            len(dados_cifrados),
+            self._TAMANHO_BLOCO,
+        ):
+            bloco_cifrado = dados_cifrados[
+                inicio:inicio + self._TAMANHO_BLOCO
+            ]
             bloco_decifrado = self._decifrar_bloco(bloco_cifrado)
             dados.extend(a ^ b for a, b in zip(bloco_decifrado, anterior))
             anterior = bloco_cifrado
